@@ -1,5 +1,7 @@
 # Low-Poly Palette Generator
 
+https://commanderfoo.github.io/palette-generator/
+
 A web-based tool for generating flat color palettes optimized for **Blender** and **low-poly game development**. Create semantically organized material atlases that can be used as a single texture for coloring multiple models.
 
 ![Preview](preview.png)
