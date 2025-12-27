@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Low-Poly Palette Generator</title>
+	<meta name="description"
+		content="Generate low-poly style material palettes for Blender. Select material categories and export a fixed-grid PNG palette.">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+	<div class="app">
+		<!-- Header -->
+		<header class="header">
+			<div class="header-title">
+				<svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5"></polygon>
+					<line x1="12" y1="22" x2="12" y2="15.5"></line>
+					<line x1="22" y1="8.5" x2="12" y2="15.5"></line>
+					<line x1="2" y1="8.5" x2="12" y2="15.5"></line>
+				</svg>
+				<h1>Low-Poly Palette</h1>
+			</div>
+			<div class="header-actions">
+				<button id="selectAll" class="btn btn-secondary">Select All</button>
+				<button id="clearAll" class="btn btn-secondary">Clear All</button>
+				<button id="downloadBtn" class="btn btn-primary">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+						<polyline points="7 10 12 15 17 10"></polyline>
+						<line x1="12" y1="15" x2="12" y2="3"></line>
+					</svg>
+					Download PNG
+				</button>
+			</div>
+		</header>
+
+		<!-- Main Content -->
+		<main class="main">
+			<!-- Category Sidebar -->
+			<aside class="sidebar">
+				<div class="sidebar-header">
+					<h2>Material Categories</h2>
+					<span class="category-count">0 / 23 selected</span>
+				</div>
+				<div class="category-list" id="categoryList">
+					<!-- Categories will be populated by JavaScript -->
+				</div>
+			</aside>
+
+			<!-- Canvas Area -->
+			<section class="canvas-area">
+				<!-- Canvas Toolbar -->
+				<div class="canvas-toolbar">
+					<div class="zoom-controls">
+						<button id="zoomOut" class="btn btn-icon" title="Zoom Out">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<circle cx="11" cy="11" r="8"></circle>
+								<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+								<line x1="8" y1="11" x2="14" y2="11"></line>
+							</svg>
+						</button>
+						<span id="zoomLevel" class="zoom-level">100%</span>
+						<button id="zoomIn" class="btn btn-icon" title="Zoom In">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<circle cx="11" cy="11" r="8"></circle>
+								<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+								<line x1="11" y1="8" x2="11" y2="14"></line>
+								<line x1="8" y1="11" x2="14" y2="11"></line>
+							</svg>
+						</button>
+						<button id="zoomReset" class="btn btn-icon" title="Reset Zoom">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+								<path d="M3 3v5h5"></path>
+							</svg>
+						</button>
+					</div>
+					<div class="toolbar-divider"></div>
+					<button id="gridToggle" class="btn btn-icon" title="Toggle Grid">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+							<line x1="3" y1="9" x2="21" y2="9"></line>
+							<line x1="3" y1="15" x2="21" y2="15"></line>
+							<line x1="9" y1="3" x2="9" y2="21"></line>
+							<line x1="15" y1="3" x2="15" y2="21"></line>
+						</svg>
+					</button>
+					<div class="toolbar-divider"></div>
+					<!-- Theme Controls -->
+					<div class="theme-controls">
+						<label for="themeSelect" class="theme-label">Theme:</label>
+						<select id="themeSelect" class="theme-select">
+							<option value="none">None (Default)</option>
+							<option value="sunset">Sunset</option>
+							<option value="icy">Icy / Winter</option>
+							<option value="rustic">Rustic / Earthy</option>
+							<option value="tropical">Tropical</option>
+							<option value="midnight">Midnight</option>
+							<option value="autumn">Autumn</option>
+							<option value="pastel">Pastel</option>
+							<option value="neon">Neon / Cyberpunk</option>
+						</select>
+					</div>
+					<div class="warmth-control">
+						<label for="warmthSlider" class="warmth-label">Warmth:</label>
+						<input type="range" id="warmthSlider" class="warmth-slider" min="-50" max="50" value="0">
+						<span id="warmthValue" class="warmth-value">0</span>
+					</div>
+					<div class="toolbar-divider"></div>
+					<div class="colorblind-control">
+						<label for="colorblindSelect" class="colorblind-label">👁️</label>
+						<select id="colorblindSelect" class="colorblind-select">
+							<option value="none">Normal Vision</option>
+							<option value="protanopia">Protanopia (Red-Blind)</option>
+							<option value="deuteranopia">Deuteranopia (Green-Blind)</option>
+							<option value="tritanopia">Tritanopia (Blue-Blind)</option>
+							<option value="achromatopsia">Achromatopsia (Grayscale)</option>
+						</select>
+					</div>
+					<span class="toolbar-hint">Scroll to zoom • Drag to pan</span>
+				</div>
+
+				<div class="canvas-wrapper" id="canvasWrapper">
+					<div class="canvas-container" id="canvasContainer">
+						<canvas id="paletteCanvas" width="1024" height="1024"></canvas>
+						<canvas id="gridCanvas" width="1024" height="1024"></canvas>
+						<div class="canvas-overlay" id="canvasOverlay">
+							<!-- Hover info will appear here -->
+						</div>
+					</div>
+				</div>
+				<div class="canvas-info">
+					<span>1024 × 1024 px</span>
+					<span>•</span>
+					<span>4 × 4 px tiles</span>
+					<span>•</span>
+					<span>256 × 256 grid</span>
+				</div>
+			</section>
+		</main>
+	</div>
+
+	<script src="app.js"></script>
+</body>
+
+</html>
