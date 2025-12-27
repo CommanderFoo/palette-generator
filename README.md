@@ -56,7 +56,7 @@ Each region contains a gradient of related colors (light→dark, warm→cool) fo
 
 This project was coded by **Claude** (Anthropic's AI assistant) through pair programming.
 
-# Vibe Coder Alert
+## Vibe Coder Alert
 
 Look mom, I am a Vibe Coder!
 
