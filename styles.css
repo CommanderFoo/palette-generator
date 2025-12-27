@@ -485,6 +485,27 @@ body {
 	text-align: center;
 }
 
+.toggle-control {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+	user-select: none;
+}
+
+.toggle-control input {
+	cursor: pointer;
+	width: 14px;
+	height: 14px;
+	accent-color: var(--accent);
+}
+
+.toggle-label {
+	font-size: 0.75rem;
+	color: var(--text-secondary);
+	font-weight: 500;
+}
+
 .colorblind-control {
 	display: flex;
 	align-items: center;

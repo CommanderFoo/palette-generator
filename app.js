@@ -19,6 +19,7 @@ const ZOOM_WHEEL_FACTOR = 0.001;
 
 // ===== LocalStorage =====
 const STORAGE_KEY = "lowpoly-palette-selections";
+const SETTINGS_KEY = "lowpoly-palette-settings";
 
 // ===== Theme Definitions =====
 const THEMES = {
@@ -800,7 +801,8 @@ const state = {
 	grid_visible: false,
 	current_theme: "none",
 	warmth: 0,
-	colorblind_mode: "none"
+	colorblind_mode: "none",
+	omit_unselected: false
 };
 
 // ===== DOM Elements =====
@@ -825,6 +827,8 @@ const theme_select = document.getElementById("themeSelect");
 const warmth_slider = document.getElementById("warmthSlider");
 const warmth_value_el = document.getElementById("warmthValue");
 const colorblind_select = document.getElementById("colorblindSelect");
+const omit_unselected_toggle = document.getElementById("omitUnselected");
+
 
 // ===== LocalStorage Functions =====
 
@@ -832,16 +836,21 @@ function save_selections() {
 	try {
 		const selections = Array.from(state.selected_categories);
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(selections));
+
+		const settings = {
+			omit_unselected: state.omit_unselected
+		};
+		localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 	} catch (err) {
-		console.warn("Could not save selections:", err);
+		console.warn("Could not save to localStorage:", err);
 	}
 }
 
 function load_selections() {
 	try {
-		const stored = localStorage.getItem(STORAGE_KEY);
-		if (stored) {
-			const selections = JSON.parse(stored);
+		const stored_selections = localStorage.getItem(STORAGE_KEY);
+		if (stored_selections) {
+			const selections = JSON.parse(stored_selections);
 			if (Array.isArray(selections)) {
 				for (const id of selections) {
 					const exists = CATEGORIES.some(function (cat) {
@@ -853,8 +862,17 @@ function load_selections() {
 				}
 			}
 		}
+
+		const stored_settings = localStorage.getItem(SETTINGS_KEY);
+		if (stored_settings) {
+			const settings = JSON.parse(stored_settings);
+			if (settings.omit_unselected !== undefined) {
+				state.omit_unselected = settings.omit_unselected;
+				omit_unselected_toggle.checked = state.omit_unselected;
+			}
+		}
 	} catch (err) {
-		console.warn("Could not load selections:", err);
+		console.warn("Could not load from localStorage:", err);
 	}
 }
 
@@ -995,6 +1013,12 @@ function render_canvas() {
 	for (var i = 0; i < CATEGORIES.length; i++) {
 		var category = CATEGORIES[i];
 		var is_selected = state.selected_categories.has(category.id);
+
+		// Skip unselected categories if the option is enabled
+		if (!is_selected && state.omit_unselected) {
+			continue;
+		}
+
 		var color_grid = is_selected
 			? generate_category_colors(category)
 			: generate_muted_colors(category);
@@ -1170,6 +1194,13 @@ function find_category_at_tile(tile_x, tile_y) {
 
 	for (var i = 0; i < CATEGORIES.length; i++) {
 		var cat = CATEGORIES[i];
+		var is_selected = state.selected_categories.has(cat.id);
+
+		// Skip unselected categories if the option is enabled
+		if (!is_selected && state.omit_unselected) {
+			continue;
+		}
+
 		var position = cat.position;
 		var tiles = cat.tiles;
 
@@ -1425,6 +1456,13 @@ function setup_theme_controls() {
 	colorblind_select.addEventListener("change", function () {
 		state.colorblind_mode = colorblind_select.value;
 		update_ui();
+	});
+
+	// Omit unselected
+	omit_unselected_toggle.addEventListener("change", function () {
+		state.omit_unselected = omit_unselected_toggle.checked;
+		save_selections();
+		render_canvas();
 	});
 }
 
