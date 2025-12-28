@@ -71,6 +71,12 @@ body {
 	flex-shrink: 0;
 }
 
+.header-left {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
 .header-title {
 	display: flex;
 	align-items: center;
@@ -92,6 +98,33 @@ body {
 .header-actions {
 	display: flex;
 	gap: 10px;
+}
+
+.github-link {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	background: var(--bg-tertiary);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	color: var(--text-secondary);
+	transition: all var(--transition);
+	text-decoration: none;
+}
+
+.github-link:hover {
+	background: var(--bg-hover);
+	color: var(--text-primary);
+	border-color: var(--border-light);
+	transform: translateY(-1px);
+}
+
+.github-link svg {
+	width: 20px;
+	height: 20px;
+	fill: currentColor;
 }
 
 /* ===== Buttons ===== */
